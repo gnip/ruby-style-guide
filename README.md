@@ -88,6 +88,8 @@ Translations of the guide are available in the following languages:
 > probably right... <br/>
 > -- Jerry Coffin (on indentation)
 
+* Limit lines to 120 characters.
+* Avoid trailing whitespace.
 * Use `UTF-8` as the source file encoding.
 * Use two **spaces** per indentation level. No hard tabs.
 
@@ -129,15 +131,15 @@ Translations of the guide are available in the following languages:
     puts 'foo', 'bar' # this applies to puts in particular
     ```
 
-* Prefer a single-line format for class definitions with no body.
+* Prefer a two-line format for class definitions with no body.
 
     ```Ruby
     # bad
-    class FooError < StandardError
-    end
+    class FooError < StandardError; end
 
     # good
-    class FooError < StandardError; end
+    class FooError < StandardError
+    end
     ```
 
 * Avoid single-line methods. Although they are somewhat popular in the
@@ -183,16 +185,6 @@ Translations of the guide are available in the following languages:
     [1, 2, 3].each { |e| puts e }
     ```
 
-    The only exception, regarding operators, is the exponent operator:
-
-    ```Ruby
-    # bad
-    e = M * c ** 2
-
-    # good
-    e = M * c**2
-    ```
-
     `{` and `}` deserve a bit of clarification, since they are used
     for block and hash literals, as well as embedded expressions in
     strings. For hash literals two styles are considered acceptable.
@@ -217,14 +209,12 @@ Translations of the guide are available in the following languages:
     # good - no spaces
     "string#{expr}"
 
-    # ok - arguably more readable
+    # bad
     "string#{ expr }"
     ```
 
     The first style is extremely more popular and you're generally
-    advised to stick with it. The second, on the other hand, is
-    (arguably) a bit more readable. As with hashes - pick one style
-    and apply it consistently.
+    advised to stick with it.
 
 * No spaces after `(`, `[` or before `]`, `)`.
 
@@ -259,39 +249,19 @@ Translations of the guide are available in the following languages:
            end
     ```
 
-* Use empty lines between `def`s and to break up a method into logical
-  paragraphs.
-
-    ```Ruby
-    def some_method
-      data = initialize(options)
-
-      data.manipulate!
-
-      data.result
-    end
-
-    def some_method
-      result
-    end
-    ```
-
-* Use spaces around the `=` operator when assigning default values to method parameters:
+* Don't use spaces around the `=` operator when assigning default values to method parameters:
 
     ```Ruby
     # bad
-    def some_method(arg1=:default, arg2=nil, arg3=[])
-      # do something...
-    end
-
-    # good
     def some_method(arg1 = :default, arg2 = nil, arg3 = [])
       # do something...
     end
+    
+    # good
+    def some_method(arg1=:default, arg2=nil, arg3=[])
+      # do something...
+    end
     ```
-
-    While several Ruby books suggest the first style, the second is much more prominent
-    in practice (and arguably a bit more readable).
 
 * Avoid line continuation (\\) where not required. In practice, avoid using
   line continuations at all.
@@ -365,8 +335,6 @@ Translations of the guide are available in the following languages:
 
 * Use RDoc and its conventions for API documentation.  Don't put an
   empty line between the comment block and the `def`.
-* Limit lines to 80 characters.
-* Avoid trailing whitespace.
 * Don't use block comments. They cannot be preceded by whitespace and are not
 as easy to spot as regular comments.
 
@@ -398,8 +366,7 @@ modules). Never use `::` for method invocation.
     SomeModule::SomeClass::SOME_CONST
     ```
 
-* Use `def` with parentheses when there are arguments. Omit the
-  parentheses when the method doesn't accept any arguments.
+* Use `def` without parentheses.
 
      ```Ruby
      def some_method
@@ -616,8 +583,7 @@ modules). Never use `::` for method invocation.
 * Omit parentheses around parameters for methods that are part of an
   internal DSL (e.g. Rake, Rails, RSpec), methods that have
   "keyword" status in Ruby (e.g. `attr_reader`, `puts`) and attribute
-  access methods. Use parentheses around the arguments of all other
-  method invocations.
+  access methods.
 
     ```Ruby
     class Person
@@ -626,13 +592,13 @@ modules). Never use `::` for method invocation.
       # omitted
     end
 
-    temperance = Person.new('Temperance', 30)
+    temperance = Person.new 'Temperance', 30
     temperance.name
 
     puts temperance.age
 
-    x = Math.sin(y)
-    array.delete(e)
+    x = Math.sin y
+    array.delete e
 
     bowling.score.should == 0
     ```
@@ -660,7 +626,7 @@ modules). Never use `::` for method invocation.
     end.map { |name| name.upcase }
 
     # good
-    names.select { |name| name.start_with?('S') }.map { |name| name.upcase }
+    names.select { |name| name.start_with? 'S' }.map { |name| name.upcase }
     ```
 
     Some will argue that multiline chaining would look OK with the use of {...}, but they should
@@ -671,12 +637,12 @@ modules). Never use `::` for method invocation.
 
     ```Ruby
     # bad
-    def some_method(some_arr)
+    def some_method some_arr
       return some_arr.size
     end
 
     # good
-    def some_method(some_arr)
+    def some_method some_arr
       some_arr.size
     end
     ```
@@ -687,7 +653,7 @@ modules). Never use `::` for method invocation.
     # bad
     def ready?
       if self.last_reviewed_at > self.last_updated_at
-        self.worker.update(self.content, self.options)
+        self.worker.update self.content, self.options
         self.status = :in_progress
       end
       self.status == :verified
@@ -696,7 +662,7 @@ modules). Never use `::` for method invocation.
     # good
     def ready?
       if last_reviewed_at > last_updated_at
-        worker.update(content, options)
+        worker.update content, options
         self.status = :in_progress
       end
       status == :verified
@@ -710,20 +676,20 @@ modules). Never use `::` for method invocation.
       attr_accessor :options
 
       # ok
-      def initialize(options)
+      def initialize options
         self.options = options
         # both options and self.options are equivalent here
       end
 
       # bad
-      def do_something(options = {})
+      def do_something options = {}
         unless options[:when] == :later
           output(self.options[:message])
         end
       end
 
       # good
-      def do_something(params = {})
+      def do_something params = {}
         unless params[:when] == :later
           output(options[:message])
         end
@@ -747,9 +713,9 @@ modules). Never use `::` for method invocation.
     end
 
     # good
-    v = array.grep(/foo/)
+    v = array.grep /foo/
     if v
-      do_something(v)
+      do_something v
       ...
     end
     ```
@@ -847,22 +813,6 @@ setting the warn level to 0 via `-W0`).
     # good
     %w(one two three).join(', ')
     # => 'one, two, three'
-    ```
-
-* Use `[*var]` or `Array()` instead of explicit `Array` check, when dealing with a
-  variable you want to treat as an Array, but you're not certain it's
-  an array.
-
-    ```Ruby
-    # bad
-    paths = [paths] unless paths.is_a? Array
-    paths.each { |path| do_something(path) }
-
-    # good
-    [*paths].each { |path| do_something(path) }
-
-    # good (and a bit more readable)
-    Array(paths).each { |path| do_something(path) }
     ```
 
 * Use ranges instead of complex comparison logic when possible.
@@ -1046,7 +996,6 @@ setting the warn level to 0 via `-W0`).
 > it even clearer. <br/>
 > -- Steve McConnell
 
-* Write self-documenting code and ignore the rest of this section. Seriously!
 * Write comments in English.
 * Use one space between the leading `#` character of the comment and the text
   of the comment.
@@ -1064,9 +1013,6 @@ at all.
 
 > Good code is like a good joke - it needs no explanation. <br/>
 > -- Russ Olsen
-
-* Avoid writing comments to explain bad code. Refactor the code to
-  make it self-explanatory. (Do or do not - there is no try. --Yoda)
 
 ### Comment Annotations
 
@@ -1440,6 +1386,7 @@ in *Ruby* now, not in *Python*.
     end
     ```
 
+#### UNDER CONSIDERATION
 * Use *implicit begin blocks* where possible.
 
     ```Ruby
@@ -1460,6 +1407,7 @@ in *Ruby* now, not in *Python*.
     end
     ```
 
+#### UNDER CONSIDERATION
 * Mitigate the proliferation of `begin` blocks by using
   *contingency methods* (a term coined by Avdi Grimm).
 
@@ -1509,7 +1457,6 @@ in *Ruby* now, not in *Python*.
     # bad - this catches all StandardError exceptions
     do_something rescue nil
     ```
-
 
 * Don't use exceptions for flow of control.
 
@@ -1597,9 +1544,6 @@ block.
     end
     ```
 
-* Favor the use of exceptions for the standard library over
-introducing new exception classes.
-
 ## Collections
 
 * Prefer literal array and hash creation notation (unless you need to
@@ -1657,7 +1601,7 @@ this rule only to arrays with two or more elements.
     hash = { 'one' => 1, 'two' => 2, 'three' => 3 }
 
     # good
-    hash = { one: 1, two: 2, three: 3 }
+    hash = {one: 1, two: 2, three: 3}
     ```
 
 * Avoid the use of mutable objects as hash keys.
@@ -1668,7 +1612,7 @@ this rule only to arrays with two or more elements.
     hash = { :one => 1, :two => 2, :three => 3 }
 
     # good
-    hash = { one: 1, two: 2, three: 3 }
+    hash = {one: 1, two: 2, three: 3}
     ```
 
 * Use `fetch` when dealing with hash keys that should be present.
@@ -1716,6 +1660,7 @@ this rule only to arrays with two or more elements.
     "#{ user.last_name }, #{ user.first_name }"
     ```
 
+#### UNDER CONSIDERATION
 * Prefer single-quoted strings when you don't need string interpolation or
   special symbols such as `\t`, `\n`, `'`, etc.
 
